@@ -12,34 +12,32 @@ class HeroResponse(object):
         self.cat = ''
 
 
-class HeroMp3Response(HTMLParser):
+class _HeroMp3Parser(HTMLParser):
 
-    def __init__(self):
-        self.mlist = []
-        self.valid_a = False
-        self.li = False
-        self.cat = ''
-        self.valid_span = False
-        HTMLParser.__init__(self)
+    mp3_list = []
+    __valid_a = False
+    __li = False
+    __cat = ''
+    __valid_span = False
 
     def handle_starttag(self, tag, attrs):
         if tag == 'li':
-            self.li = True
+            self.__li = True
             r = HeroResponse()
-            self.mlist.append(r)
+            self.mp3_list.append(r)
 
         if tag == 'span':
             for attr in attrs:
                 if attr[0] == 'class':
                     if attr[1] == 'mw-headline':
-                        self.valid_span = True;
+                        self.__valid_span = True;
 
         if tag == 'a':
             if len(attrs) > 0:
                 href = ''
                 title = False
 
-                if self.li:
+                if self.__li:
                    for attr in attrs:
                         if attr[0] == 'href':
                             href = attr[1]
@@ -47,30 +45,30 @@ class HeroMp3Response(HTMLParser):
                             title = attr[1] == 'Play'
 
                 if title:
-                    self.valid_a = True
-                    self.mlist[-1].mp3_url.append(href)
+                    self.__valid_a = True
+                    self.mp3_list[-1].mp3_url.append(href)
 
 
     def handle_data(self, data):
-        if self.li and self.valid_a:
-            self.mlist[-1].text = data
-            self.mlist[-1].cat = self.cat
+        if self.__li and self.__valid_a:
+            self.mp3_list[-1].text = data
+            self.mp3_list[-1].cat = self.__cat
 
-        if self.valid_span:
-            self.cat = data;
+        if self.__valid_span:
+            self.__cat = data;
 
     def handle_endtag(self, tag):
         if tag == 'li':
-            self.li = False
-            self.valid_a = False
+            self.__li = False
+            self.__valid_a = False
 
         if tag == 'span':
-            self.valid_span = False
+            self.__valid_span = False
 
 
-class HeroNamesParser(HTMLParser):
+class _HeroNamesParser(HTMLParser):
 
-    alist = []
+    name_list = []
 
     def handle_starttag(self, tag, attrs):
         if tag == 'img':
@@ -88,9 +86,9 @@ class HeroNamesParser(HTMLParser):
                         png = attr[1]
 
                 if w and h:
-                    self.alist.append(png.replace(' ', '_')
-                                      .replace('.png','')
-                                      .replace('\'','%27'))
+                    self.name_list.append(png.replace(' ', '_')
+                                          .replace('.png','')
+                                          .replace('\'','%27'))
 
 class Hero(object):
 
@@ -99,15 +97,15 @@ class Hero(object):
         url = '{0}{1}/Responses'.format(base_url,name)
         r = requests.get(url)
         pure_html = r.content
-        parser = HeroMp3Response()
+        parser = _HeroMp3Parser()
         parser.feed(pure_html)
-        return  [item for item in parser.mlist if item.text]
+        return [item for item in parser.mp3_list if item.text]
 
     @staticmethod
     def get_heroes_names():
         url = '{0}heroes'.format(base_url)
         r = requests.get(url)
         pure_html = r.content
-        parser = HeroNamesParser()
+        parser = _HeroNamesParser()
         parser.feed(pure_html)
-        return parser.alist;
+        return parser.name_list;

@@ -14,11 +14,13 @@ class HeroResponse(object):
 
 class _HeroMp3Parser(HTMLParser):
 
-    mp3_list = []
-    __valid_a = False
-    __li = False
-    __cat = ''
-    __valid_span = False
+    def __init__(self):
+        self.mp3_list = []
+        self.__valid_a = False
+        self.__li = False
+        self.__cat = ''
+        self.__valid_span = False
+        HTMLParser.__init__(self)
 
     def handle_starttag(self, tag, attrs):
         if tag == 'li':

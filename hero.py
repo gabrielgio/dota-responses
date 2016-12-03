@@ -32,7 +32,7 @@ class _HeroMp3Parser(HTMLParser):
             for attr in attrs:
                 if attr[0] == 'class':
                     if attr[1] == 'mw-headline':
-                        self.__valid_span = True;
+                        self.__valid_span = True
 
         if tag == 'a':
             if len(attrs) > 0:
@@ -57,7 +57,7 @@ class _HeroMp3Parser(HTMLParser):
             self.mp3_list[-1].cat = self.__cat
 
         if self.__valid_span:
-            self.__cat = data;
+            self.__cat = data
 
     def handle_endtag(self, tag):
         if tag == 'li':
@@ -110,4 +110,4 @@ class Hero(object):
         pure_html = r.content
         parser = _HeroNamesParser()
         parser.feed(pure_html)
-        return parser.name_list;
+        return parser.name_list

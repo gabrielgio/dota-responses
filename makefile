@@ -1,13 +1,10 @@
-Z=zip
 N=dota-response
-T=temp
 
 
 all:
-	    $(Z) $(N) *.py
-	    mv '$(N).zip' $(N)
-			echo '#!/usr/bin/python' | cat - $(N) > $(T) && mv $(T) $(N)
-			chmod +x $(N)
+	    nuitka --recurse-on --recurse-directory --remove-output --portable --python-version=2.7 __main__.py
+	    mv __main__.exe $(N)
+	    rm -rf __main__.build  __main__.dist
 
 install:
 	mv $(N) /usr/local
